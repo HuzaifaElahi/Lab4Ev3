@@ -1,18 +1,20 @@
 package ca.mcgill.ecse211.lab4;
 
+import ca.mcgill.ecse211.lab4.UltrasonicPoller;
+import ca.mcgill.ecse211.lab4.UltrasonicLocalizer.LocalizationType;
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 public class Lab4 {
 
-	  private static final int MOTOR_HIGH = 200; // Speed of the faster rotating wheel (deg/seec)
-	  private static final int ROTATE_SPEED = 150;
+
 	  private static final TextLCD lcd = LocalEV3.get().getTextLCD();
 	  public static final double WHEEL_RAD = 2.2;
 	  public static final double SQUARE_SIZE = 30.48;
@@ -20,7 +22,7 @@ public class Lab4 {
 	  static Odometer odometer = null;
 	  
 	  //Motors and distance sensor
-	  private static final Port usPort = LocalEV3.get().getPort("S1");
+	  static final Port usPort = LocalEV3.get().getPort("S1");
 	  public static final EV3LargeRegulatedMotor leftMotor =
 	      new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	  public static final EV3LargeRegulatedMotor rightMotor =
@@ -34,12 +36,40 @@ public class Lab4 {
 
 	
 	public static void main(String[] args) throws Exception {
+		int buttonChoice;
+		do {
+		 lcd.clear();   		// clear the display
+
+	      // Ask the user whether map 1 or 2 / map 3 or 4 should be selected
+	      lcd.drawString("<      |      >", 0, 0);
+	      lcd.drawString("Falling|Rising ", 0, 1);
+	      lcd.drawString(" Edge  |  Edge ", 0, 2);
+	      lcd.drawString("       |       ", 0, 3);
+	      lcd.drawString("<      |      >", 0, 4);
+
+	      buttonChoice = Button.waitForAnyPress();      // Record choice (left or right press)
+	   
+	      // Until button pressed
+	    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT); 
+		
+
 		odometer = new Odometer(leftMotor, rightMotor, TRACK, WHEEL_RAD);
 		Thread odoThread = new Thread(odometer);
 	    odoThread.start();
-	    Navigation navig = new Navigation();
-		navig.start();
+	    Navigation nav = new Navigation();
+		nav.start();
 		Display LCD = new Display(lcd);
+		
+	    if (buttonChoice == Button.ID_LEFT) {
+	    	UltrasonicLocalizer usl = new UltrasonicLocalizer(LocalizationType.FALLING_EDGE, odometer, nav);
+	    }
+	    else {
+	    	UltrasonicLocalizer usl = new UltrasonicLocalizer(LocalizationType.RISING_EDGE, odometer, nav);
+	    }
+
+
+		
+		
 		
 		// Wait before starting
 		Button.waitForAnyPress();
