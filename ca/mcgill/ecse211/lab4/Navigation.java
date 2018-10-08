@@ -20,10 +20,6 @@ public class Navigation {
     private static final int ROTATE_SPEED = 150;   // Speed upon rotation
     private final double ODOMETER_ADJUSTMENT = 0.5;    // Adjusts the inaccuracy of the odometer
 
-    public static final double WHEEL_RAD = 2.18;                         // Radius of the wheel
-    public static final double SQUARE_SIZE = 30.48;                     // Size of tiles
-    public static final double TRACK = 13.86;                           // Distance from wheel to wheel
-
     //Motors initialized
     public static EV3LargeRegulatedMotor leftMotor;
     public static EV3LargeRegulatedMotor rightMotor;
@@ -44,7 +40,7 @@ public class Navigation {
         Navigation.leftMotor = leftMotor;
         Navigation.rightMotor = rightMotor;
         try {
-			this.odometer = Odometer.getOdometer(Navigation.leftMotor, Navigation.rightMotor, TRACK, WHEEL_RAD);
+			this.odometer = Odometer.getOdometer(Navigation.leftMotor, Navigation.rightMotor, Lab4.TRACK, Lab4.WHEEL_RAD);
 		} catch (OdometerExceptions e) {
 			System.out.println("no odo");
 		}
@@ -73,8 +69,8 @@ public class Navigation {
         }
 
         // Convert X & Y coordinates to actual length (cm)
-        x = x*SQUARE_SIZE;
-        y = y*SQUARE_SIZE;
+        x = x*Lab4.SQUARE_SIZE;
+        y = y*Lab4.SQUARE_SIZE;
 
         // Set odometer reading angle as prevAngle
         prevAngle = odometer[2];
@@ -147,11 +143,11 @@ public class Navigation {
         rightMotor.setSpeed(ROTATE_SPEED);
 
         if (turnLeft) {
-          leftMotor.rotate(-convertAngle(WHEEL_RAD, TRACK, deltaAngle), true);
-          rightMotor.rotate(convertAngle(WHEEL_RAD, TRACK, deltaAngle), false);
+          leftMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
+          rightMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
         } else {
-          leftMotor.rotate(convertAngle(WHEEL_RAD, TRACK, deltaAngle), true);
-          rightMotor.rotate(-convertAngle(WHEEL_RAD, TRACK, deltaAngle), false);
+          leftMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
+          rightMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
         }
         
         prevAngle = theta;
