@@ -17,6 +17,7 @@ public class Lab4 {
 	public static final double TRACK = 14.00;
 	public static boolean isUSLocalizing = false;
 	public static boolean isLightLocalizing = false;
+	public static boolean isLightLocalizingTurn = false;
 	static Odometer odometer = null;
 
 	//Motors and sensos
@@ -81,8 +82,6 @@ public class Lab4 {
 	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
 	    	 lightLocalizer.start();
 	     }
-	//	 isLightLocalizing = false;
-
 		
 
 	}

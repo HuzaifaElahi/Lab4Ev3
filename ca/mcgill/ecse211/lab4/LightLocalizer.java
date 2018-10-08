@@ -18,15 +18,15 @@ public class LightLocalizer extends Thread implements Runnable {
 	private float color[];
 	private static final double SQUARE_SIZE = 30.48;
 	private static final int SENSOR_OFFSET = 13;
-	ArrayList<Double> points = new ArrayList<Double>();
+	static ArrayList<Double> points = new ArrayList<Double>();
 	private float[] csData;
-	private double correctX, correctY;
 	double[] oldResult = new double [3];
 	double oldSample;
-	int passedLine;
+	static int passedLine;
 	static double newColor;
-	int countx;
-	int county;
+	private static final double D = 4;
+	static double xOffset = 0;
+	static double yOffset = 0;
 	double dy;
 	double dx;
 
@@ -43,47 +43,77 @@ public class LightLocalizer extends Thread implements Runnable {
 
 	@Override
 	public void run() {
-		long correctionStart, correctionEnd;
+		odo.setTheta(0);
 		try {
 			goToOrigin();
 		} catch (OdometerExceptions e1) {
 		}
-		doLocalization();
+		getLocalizationPts();
+		Lab4.isLightLocalizing = false;
+		try {
+			performLocalization();
+		} catch (OdometerExceptions e) {
+		}
+
 	} 
 
-	private void doLocalization() {
+	private void performLocalization() throws OdometerExceptions {
+		Lab4.isLightLocalizingTurn = true;
+		double yp = points.get(0);
+		double xp = points.get(1);
+		double yn = points.get(2);
+		double xn = points.get(3);
+
+		xOffset = -D * Math.cos((yn - yp) / 2);
+		yOffset = -D * Math.abs(Math.cos((xn - xp) / 2));
+
+		// correct the odometer
+		odo.setX(xOffset);
+		odo.setY(yOffset);
+
+		// this makes sure it travels to the true origin
+		Navigation.turnTo(odo.getXYT()[2]+(90-((yn-yp)-180)+(yn-yp)/2));
+		//Navigation.turnTo(0);
+		Navigation.travelToHypot(0, 0);
+		Lab4.leftMotor.stop(true);
+		Lab4.rightMotor.stop(false);
+
+
+	}
+
+	private void getLocalizationPts() {
 		long correctionStart, correctionEnd;
+		double currentOdo = odo.getXYT()[2];
+		Lab4.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Lab4.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Navigation.leftMotor.backward();
+		Navigation.rightMotor.forward();
+
 		while(true) {
 			//color sensor and scaling
 			myColorSample.fetchSample(color, 0);
 			newColor = csData[0];
 			correctionStart = System.currentTimeMillis();
-			// Trigger correction : store data in newColor
-			myColorSample.fetchSample(color, 0);
-			newColor = csData[0];
 			// Store current robot position and current theta
 			result = odo.getXYT();
-			double theta = result[2];
 			//If line detected (intensity less than 0.3), only count once by keeping track of last value
 			if((newColor) < 0.3 && oldSample > 0.3) {
 				//Error handling 
 				if(result != null) {
 					//Beep to notify, update counter and find and set correct X and Y using old reference pts
-					if(passedLine < 4) {
-						passedLine++;
-						points.add(result[2]);
-						Sound.beep();
-					}
+					passedLine++;
+					points.add(result[2]);
+					Sound.beep();
 				}
-
-				//Set new correct XYT and store info for next loop
-				oldResult[0] = correctX;
-				oldResult[1] = correctY;
-				oldResult[2] = theta;
-				oldSample = newColor;
 			}
 			//Store color sample
 			oldSample = newColor;
+			
+			if(passedLine > 0) {
+				if(result[2] > currentOdo - 5 && result[2] < currentOdo + 5) {
+					break;
+				}
+			}
 			// this ensure the odometry correction occurs only once every period
 			correctionEnd = System.currentTimeMillis();
 			if (correctionEnd - correctionStart < 10) {
@@ -93,8 +123,9 @@ public class LightLocalizer extends Thread implements Runnable {
 					// there is nothing to be done here
 				}
 			}
-
 		}
+		Navigation.leftMotor.stop(true);
+		Navigation.rightMotor.stop(false);
 	}
 
 	private void goToOrigin() throws OdometerExceptions {
@@ -121,14 +152,14 @@ public class LightLocalizer extends Thread implements Runnable {
 				Navigation.rightMotor.stop(false);
 				Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 				Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
-			    Navigation.leftMotor.rotate(-Navigation.convertDistance(Lab4.WHEEL_RAD, SENSOR_OFFSET), true);
-			    Navigation.rightMotor.rotate(-Navigation.convertDistance(Lab4.WHEEL_RAD, SENSOR_OFFSET), false);
-			    Navigation.leftMotor.stop(true);
+				Navigation.leftMotor.rotate(-Navigation.convertDistance(Lab4.WHEEL_RAD, SENSOR_OFFSET), true);
+				Navigation.rightMotor.rotate(-Navigation.convertDistance(Lab4.WHEEL_RAD, SENSOR_OFFSET), false);
+				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
 				break;
 			}
 			oldSample = newColor;
-			
+
 		}
 	}
 }

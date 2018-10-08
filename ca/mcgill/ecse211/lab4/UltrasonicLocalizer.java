@@ -12,7 +12,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	static final int MOTOR_SPEED = 100;
 	private static final int D_THRESHHOLD = 30;
 	private static final int NOISE_MARGIN = 5;
-	private static final int FILTER_OUT = 10;
+	private static final int FILTER_OUT = 15;
 	private static final int ODO_CORRECTION = 0;
 	private static double ALPHA = 0;
 	private static double BETA = 0;
@@ -64,22 +64,27 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Print values
 
-		Lab4.lcd.clear();
 		if(Lab4.isUSLocalizing) {
+			Lab4.lcd.clear();
 			Lab4.lcd.drawString("Distance: " + distance, 0, 1);
 			Lab4.lcd.drawString("Alpha: " + ALPHA, 0, 2);
 			Lab4.lcd.drawString("Beta: " + BETA, 0, 3);
 			Lab4.lcd.drawString("Final: " + FINAL_ANGLE, 0, 4);
 		} else if(Lab4.isLightLocalizing) {
 			Lab4.lcd.clear();
-			String printThisColor = "color: "+ LightLocalizer.newColor;
-			Lab4.lcd.drawString(printThisColor, 0, 2);
-			String printThisX = "x: "+ LightLocalizer.result[0];
-			Lab4.lcd.drawString(printThisX, 0, 3);
-			String printThisY = "y: "+ LightLocalizer.result[1];
-			Lab4.lcd.drawString(printThisY, 0, 4);
-			String printThisTheta = "theta: "+ LightLocalizer.result[2];
-			Lab4.lcd.drawString(printThisTheta, 0, 5);
+			Lab4.lcd.drawString("color: "+ LightLocalizer.newColor, 0, 2);
+			Lab4.lcd.drawString("x: "+ LightLocalizer.result[0], 0, 3);
+			Lab4.lcd.drawString("y: "+ LightLocalizer.result[1], 0, 4);
+			Lab4.lcd.drawString("theta: "+ LightLocalizer.result[2], 0, 5);
+		}
+		else if(Lab4.isLightLocalizingTurn) {
+			Lab4.lcd.clear();
+			Lab4.lcd.drawString("passedLines: " + LightLocalizer.passedLine, 0, 1);
+			Lab4.lcd.drawString("points size: " + LightLocalizer.points.size(), 0, 2);
+			Lab4.lcd.drawString("x: " + odo.getXYT()[0], 0, 3);
+			Lab4.lcd.drawString("y: " + odo.getXYT()[1], 0, 4);
+			Lab4.lcd.drawString("theta: " + odo.getXYT()[2], 0, 5);
+
 		}
 
 	}
@@ -148,9 +153,9 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		//TODO SORT THIS STUFF OUT
 		// Alpha and Beta algorithms
 		if (ALPHA < BETA) {
-			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
+			ANGLE_CORRECTION = 40 - ((ALPHA + BETA) / 2); 
 		} else {
-			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
+			ANGLE_CORRECTION = 220 - ((ALPHA + BETA) / 2);
 		} 
 
 		// Set theta to 0 to apply correction
@@ -226,9 +231,9 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		//TODO SORT THIS STUFF OUT
 		// Alpha and Beta algorithms
 		if (ALPHA > BETA) {
-			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
+			ANGLE_CORRECTION = 40 - ((ALPHA + BETA) / 2); 
 		} else {
-			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
+			ANGLE_CORRECTION = 220 - ((ALPHA + BETA) / 2);
 		} 
 
 		// Set theta to 0 to apply correction

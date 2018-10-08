@@ -118,6 +118,36 @@ public class Navigation {
         }
     }
     
+    static void travelToHypot(double x, double y) throws OdometerExceptions {
+		double calcTheta = 0, distance = 0, deltaX = 0, deltaY = 0;
+
+        double[] odometer = Odometer.getOdometer().getXYT();
+
+		double odoAngle = odometer[2];
+
+		deltaX = x*Lab4.SQUARE_SIZE- odometer[0];;
+		deltaY = y*Lab4.SQUARE_SIZE - odometer[1];
+	
+		distance = Math.hypot(Math.abs(deltaX), Math.abs(deltaY));
+		calcTheta = Math.toDegrees(Math.atan2(deltaX, deltaY));
+
+		//if result is negative subtract it from 360 to get the positive
+		if (calcTheta < 0)
+			calcTheta = 360 - Math.abs(calcTheta);
+
+		// turn to the found angle
+		//turnTo(calcTheta);
+	
+
+		// go
+		leftMotor.setSpeed(Navigation.MOTOR_HIGH);
+		rightMotor.setSpeed(Navigation.MOTOR_HIGH);
+		leftMotor.rotate(convertDistance(Lab4.WHEEL_RAD, distance), true);
+		rightMotor.rotate(convertDistance(Lab4.WHEEL_RAD, distance), true);
+
+		
+	}
+    
     /**
      * This method causes the robot to turn (on point) to the absolute heading theta
      * 
