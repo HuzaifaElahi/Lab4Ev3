@@ -14,9 +14,9 @@ public class Lab4 {
 
 
 	public static final TextLCD lcd = LocalEV3.get().getTextLCD();
-	public static final double WHEEL_RAD = 2.19;
+	public static final double WHEEL_RAD = 2.2;
 	public static final double SQUARE_SIZE = 30.48;
-	public static final double TRACK = 16.00;
+	public static final double TRACK = 14.00;
 	static Odometer odometer = null;
 
 	//Motors and distance sensor
