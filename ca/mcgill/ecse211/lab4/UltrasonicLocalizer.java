@@ -63,11 +63,24 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		}
 
 		// Print values
+
 		Lab4.lcd.clear();
-		Lab4.lcd.drawString("Distance: " + distance, 0, 1);
-		Lab4.lcd.drawString("Alpha: " + ALPHA, 0, 2);
-		Lab4.lcd.drawString("Beta: " + BETA, 0, 3);
-		Lab4.lcd.drawString("Final: " + FINAL_ANGLE, 0, 4);
+		if(Lab4.isUSLocalizing) {
+			Lab4.lcd.drawString("Distance: " + distance, 0, 1);
+			Lab4.lcd.drawString("Alpha: " + ALPHA, 0, 2);
+			Lab4.lcd.drawString("Beta: " + BETA, 0, 3);
+			Lab4.lcd.drawString("Final: " + FINAL_ANGLE, 0, 4);
+		} else if(Lab4.isLightLocalizing) {
+			Lab4.lcd.clear();
+			String printThisColor = "color: "+ LightLocalizer.newColor;
+			Lab4.lcd.drawString(printThisColor, 0, 2);
+			String printThisX = "x: "+ LightLocalizer.result[0];
+			Lab4.lcd.drawString(printThisX, 0, 3);
+			String printThisY = "y: "+ LightLocalizer.result[1];
+			Lab4.lcd.drawString(printThisY, 0, 4);
+			String printThisTheta = "theta: "+ LightLocalizer.result[2];
+			Lab4.lcd.drawString(printThisTheta, 0, 5);
+		}
 
 	}
 
@@ -273,7 +286,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Checks if risingEdge, i.e distance
 	 * goes above the threshold

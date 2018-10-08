@@ -15,6 +15,8 @@ public class Lab4 {
 	public static final double WHEEL_RAD = 2.2;
 	public static final double SQUARE_SIZE = 30.48;
 	public static final double TRACK = 14.00;
+	public static boolean isUSLocalizing = false;
+	public static boolean isLightLocalizing = false;
 	static Odometer odometer = null;
 
 	//Motors and sensos
@@ -55,26 +57,32 @@ public class Lab4 {
 		Navigation nav = new Navigation(leftMotor, rightMotor, odometer);
 		
 		if (buttonChoice == Button.ID_LEFT) {
+			isUSLocalizing = true;
 			UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(LocalizationType.FALLING_EDGE, odometer, nav);
 			usLocalizer.fallingEdge();
 		}
 		else {
+			isUSLocalizing = true;
 			UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(LocalizationType.RISING_EDGE, odometer, nav);
 			usLocalizer.risingEdge();
 		}
-
+		
+		isUSLocalizing = false;
 		// Wait before starting
 		Button.waitForAnyPress();
 		
-		 if (buttonChoice == Button.ID_RIGHT) {     
+		 if (buttonChoice == Button.ID_RIGHT) {   
+			 isLightLocalizing = true;
 	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
 	    	 lightLocalizer.start();
 	      }
 	     else {
+			 isLightLocalizing = true;
 	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
 	    	 lightLocalizer.start();
 	     }
-		
+	//	 isLightLocalizing = false;
+
 		
 
 	}
