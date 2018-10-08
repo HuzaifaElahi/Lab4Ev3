@@ -118,11 +118,12 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		}
 
 
-		if (ALPHA < BETA) {
+		if (ALPHA > BETA) {
 			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
 		} else {
 			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
 		} 
+		Odometer.getOdometer().setTheta(0);
 
 		Navigation.turnTo(ANGLE_CORRECTION);
 	}
@@ -134,7 +135,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	void risingEdge() throws OdometerExceptions{
 		double[] odometer = {0,0,0};
 		boolean isBelowThresh = false;
-			Odometer.getOdometer().setTheta(0);
+		Odometer.getOdometer().setTheta(0);
 
 		// Checks orientation or sets orientation to perform localization
 		if (readUSDistance() < (D_THRESHHOLD + NOISE_MARGIN)) {
@@ -172,7 +173,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			if (isFalling() && isBelowThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
-				BETA = odometer[2];
+				BETA = 180-odometer[2];
 				break;
 			}
 		}
@@ -182,6 +183,8 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		} else {
 			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
 		} 
+		
+		Odometer.getOdometer().setTheta(0);
 
 		Navigation.turnTo(ANGLE_CORRECTION);
 	}
