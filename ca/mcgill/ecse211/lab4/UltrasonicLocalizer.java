@@ -9,7 +9,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	private LocalizationType type;
 	private Odometer odo;
 	private Navigation nav;
-	private static final int MOTOR_SPEED = 100;
+	static final int MOTOR_SPEED = 100;
 	private static final int D_THRESHHOLD = 30;
 	private static final int NOISE_MARGIN = 5;
 	private static final int FILTER_OUT = 10;

@@ -18,7 +18,7 @@ public class Navigation {
     // Parameters: Can adjust these for desired performance
     private static final int MOTOR_HIGH = 100;     // Speed of the faster rotating wheel (deg/seec)
     private static final int ROTATE_SPEED = 100;   // Speed upon rotation
-    private final double ODOMETER_ADJUSTMENT = 0.5;    // Adjusts the inaccuracy of the odometer
+    private final static double ODOMETER_ADJUSTMENT = 0.5;    // Adjusts the inaccuracy of the odometer
 
     //Motors initialized
     public static EV3LargeRegulatedMotor leftMotor;
@@ -54,7 +54,7 @@ public class Navigation {
      * @param y
      * @return void
      */
-    public void travelTo(double x, double y) {
+    public static void travelTo(double x, double y) {
         // Define variables
         double odometer[] = { 0, 0, 0 }, absAngle = 0, deltaX = 0, deltaY = 0;
 
@@ -170,7 +170,7 @@ public class Navigation {
      * @param distance
      * @return int
      */
-    private static int convertDistance(double radius, double distance) {
+    static int convertDistance(double radius, double distance) {
         return (int) ((180.0 * distance) / (Math.PI * radius));
     }
 
@@ -182,7 +182,7 @@ public class Navigation {
      * @param distance
      * @return int
      */
-    private static int convertAngle(double radius, double width, double angle) {
+    static int convertAngle(double radius, double width, double angle) {
         return convertDistance(radius, Math.PI * width * angle / 360.0);
     }
 }

@@ -6,9 +6,7 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
-import lejos.hardware.sensor.EV3ColorSensor;
-import lejos.hardware.sensor.SensorModes;
-import lejos.robotics.SampleProvider;
+
 
 public class Lab4 {
 
@@ -19,18 +17,13 @@ public class Lab4 {
 	public static final double TRACK = 14.00;
 	static Odometer odometer = null;
 
-	//Motors and distance sensor
+	//Motors and sensos
 	static final Port usPort = LocalEV3.get().getPort("S1");
+	static final Port portColor = LocalEV3.get().getPort("S2");
 	public static final EV3LargeRegulatedMotor leftMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	public static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-
-	//Color Sensor and its variables are initialized
-	private static final Port portColor = LocalEV3.get().getPort("S2");
-	public static SensorModes myColor = new EV3ColorSensor(portColor);
-	public static SampleProvider myColorSample = myColor.getMode("Red");
-	static float[] sampleColor = new float[myColor.sampleSize()]; 
 
 
 	public static void main(String[] args) throws OdometerExceptions {
@@ -61,19 +54,28 @@ public class Lab4 {
 		odoThread.start();
 		Navigation nav = new Navigation(leftMotor, rightMotor, odometer);
 		
-		//		nav.start();
-
 		if (buttonChoice == Button.ID_LEFT) {
-			UltrasonicLocalizer usl = new UltrasonicLocalizer(LocalizationType.FALLING_EDGE, odometer, nav);
-			usl.fallingEdge();
+			UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(LocalizationType.FALLING_EDGE, odometer, nav);
+			usLocalizer.fallingEdge();
 		}
 		else {
-			UltrasonicLocalizer usl = new UltrasonicLocalizer(LocalizationType.RISING_EDGE, odometer, nav);
-			usl.risingEdge();
+			UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(LocalizationType.RISING_EDGE, odometer, nav);
+			usLocalizer.risingEdge();
 		}
 
 		// Wait before starting
 		Button.waitForAnyPress();
+		
+		 if (buttonChoice == Button.ID_RIGHT) {     
+	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
+	    	 lightLocalizer.start();
+	      }
+	     else {
+	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
+	    	 lightLocalizer.start();
+	     }
+		
+		
 
 	}
 
