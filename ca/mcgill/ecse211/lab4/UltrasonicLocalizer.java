@@ -11,7 +11,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	private Navigation nav;
 	private static final int MOTOR_SPEED = 100;
 	private static final int D_THRESHHOLD = 30;
-	private static final int NOISE_MARGIN = 1;
+	private static final int NOISE_MARGIN = 5;
 	private static final int FILTER_OUT = 10;
 	private static double ALPHA = 0;
 	private static double BETA = 0;
@@ -138,12 +138,12 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		Odometer.getOdometer().setTheta(0);
 
 		// Checks orientation or sets orientation to perform localization
-		if (readUSDistance() < (D_THRESHHOLD + NOISE_MARGIN)) {
-			isBelowThresh = true;
-		} else {
+//		if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
+//			isBelowThresh = true;
+//		} else {
 			findWallBelow();
 			isBelowThresh = true;
-		}
+//		}
 
 		// Find first rising edge
 		while (true) {
@@ -166,11 +166,11 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			Navigation.leftMotor.backward();
 			Navigation.rightMotor.forward();
 
-			if (readUSDistance() < (D_THRESHHOLD + NOISE_MARGIN)) {
+			if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
 				isBelowThresh = true;
 			}
 
-			if (isFalling() && isBelowThresh) {
+			if (isRising() && isBelowThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
 				BETA = 180-odometer[2];
@@ -178,7 +178,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			}
 		}
 
-		if (ALPHA < BETA) {
+		if (ALPHA > BETA) {
 			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
 		} else {
 			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
@@ -213,7 +213,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			Navigation.leftMotor.forward();
 			Navigation.rightMotor.backward();;
 
-			if (readUSDistance() < (D_THRESHHOLD + NOISE_MARGIN)) {
+			if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
 				break;
