@@ -32,8 +32,6 @@ public class Odometer extends OdometerData implements Runnable {
   private final double TRACK;
   private final double WHEEL_RAD;
 
-  private double[] position;
-
 
   private static final long ODOMETER_PERIOD = 25; // odometer update period in ms
 
