@@ -72,10 +72,6 @@ public class Lab4 {
 			usl.risingEdge();
 		}
 
-
-
-
-
 		// Wait before starting
 		Button.waitForAnyPress();
 

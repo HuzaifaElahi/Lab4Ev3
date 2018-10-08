@@ -94,8 +94,8 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Find second falling edge
 		while (true) {
-			Navigation.leftMotor.forward();
-			Navigation.rightMotor.backward();
+			Navigation.leftMotor.backward();
+			Navigation.rightMotor.forward();
 
 			if (readUSDistance() > (D_THRESHHOLD + NOISE_MARGIN)) {
 				isAboveThresh = true;
@@ -149,8 +149,8 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Find second rising edge
 		while (true) {
-			Navigation.leftMotor.forward();
-		    Navigation.rightMotor.backward();
+			Navigation.leftMotor.backward();
+		    Navigation.rightMotor.forward();
 
 			if (readUSDistance() < (D_THRESHHOLD + NOISE_MARGIN)) {
 				isBelowThresh = true;
@@ -177,7 +177,6 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	 * Sets orientation of robot so it can perform the localization with falling edges 
 	 */
 	void findWallAbove() {
-		double theta = 0;
 		while (true) {
 			Navigation.leftMotor.forward();
 		    Navigation.rightMotor.backward();
@@ -188,15 +187,12 @@ public class UltrasonicLocalizer implements UltrasonicController {
 				break;
 			}
 		}
-		// Rotate a little further to guarantee detection
-		Navigation.turnTo(30 + theta);
 	}
 
 	/**
 	 * Sets orientation of robot so it can perform the localization with rising edges 
 	 */
 	void findWallBelow() {
-		double theta = 0;
 		while (true) {
 			Navigation.leftMotor.forward();
 		    Navigation.rightMotor.backward();;
@@ -207,8 +203,6 @@ public class UltrasonicLocalizer implements UltrasonicController {
 				break;
 			}
 		}
-		// Rotate a little further to guarantee detection
-		Navigation.turnTo(30 + theta);
 	}
 
 	boolean isFalling() {
