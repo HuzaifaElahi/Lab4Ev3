@@ -16,8 +16,8 @@ public class Navigation {
 
     
     // Parameters: Can adjust these for desired performance
-    private static final int MOTOR_HIGH = 200;     // Speed of the faster rotating wheel (deg/seec)
-    private static final int ROTATE_SPEED = 150;   // Speed upon rotation
+    private static final int MOTOR_HIGH = 100;     // Speed of the faster rotating wheel (deg/seec)
+    private static final int ROTATE_SPEED = 100;   // Speed upon rotation
     private final double ODOMETER_ADJUSTMENT = 0.5;    // Adjusts the inaccuracy of the odometer
 
     //Motors initialized

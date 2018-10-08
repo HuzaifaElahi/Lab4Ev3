@@ -13,9 +13,11 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	private static final int D_THRESHHOLD = 30;
 	private static final int NOISE_MARGIN = 5;
 	private static final int FILTER_OUT = 10;
+	private static final int ODO_CORRECTION = 0;
 	private static double ALPHA = 0;
 	private static double BETA = 0;
 	private static double ANGLE_CORRECTION = 0;
+	private static double FINAL_ANGLE = 0;
 	private int filterControl;
 
 	private int distance;
@@ -65,7 +67,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		Lab4.lcd.drawString("Distance: " + distance, 0, 1);
 		Lab4.lcd.drawString("Alpha: " + ALPHA, 0, 2);
 		Lab4.lcd.drawString("Beta: " + BETA, 0, 3);
-		Lab4.lcd.drawString("Correct: " + ANGLE_CORRECTION, 0, 4);
+		Lab4.lcd.drawString("Final: " + FINAL_ANGLE, 0, 4);
 
 	}
 
@@ -125,14 +127,14 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			if (isFalling() && isAboveThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
-				BETA = 180-odometer[2];
+				BETA = odometer[2];
 				break;
 			}
 		}
 
 		//TODO SORT THIS STUFF OUT
 		// Alpha and Beta algorithms
-		if (ALPHA > BETA) {
+		if (ALPHA < BETA) {
 			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
 		} else {
 			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
@@ -140,8 +142,9 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Set theta to 0 to apply correction
 		// from current reference angle
-		Odometer.getOdometer().setTheta(0);
-		Navigation.turnTo(ANGLE_CORRECTION);
+		//Odometer.getOdometer().setTheta(0);
+		FINAL_ANGLE = 180-(ANGLE_CORRECTION+odometer[2]+ODO_CORRECTION);
+		Navigation.turnTo(FINAL_ANGLE);
 	}
 
 	/**
@@ -202,7 +205,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			if (isRising() && isBelowThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
-				BETA = 180-odometer[2];
+				BETA = odometer[2];
 				break;
 			}
 		}
@@ -217,8 +220,9 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Set theta to 0 to apply correction
 		// from current reference angle
-		Odometer.getOdometer().setTheta(0);
-		Navigation.turnTo(ANGLE_CORRECTION);
+		//Odometer.getOdometer().setTheta(0);
+		FINAL_ANGLE = 180-(ANGLE_CORRECTION+odometer[2]+ODO_CORRECTION);
+		Navigation.turnTo(FINAL_ANGLE);
 	}
 
 	/**
