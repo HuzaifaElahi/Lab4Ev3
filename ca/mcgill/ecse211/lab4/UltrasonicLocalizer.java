@@ -59,6 +59,8 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			filterControl = 0;
 			this.distance = distance;
 		}
+
+		// Print values
 		Lab4.lcd.clear();
 		Lab4.lcd.drawString("Distance: " + distance, 0, 1);
 		Lab4.lcd.drawString("Alpha: " + ALPHA, 0, 2);
@@ -72,6 +74,8 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	 * @throws OdometerExceptions 
 	 */
 	void fallingEdge() throws OdometerExceptions{
+
+		//Instantiate odometer storage and set theta of odometer to 0
 		double[] odometer = {0,0,0};
 		boolean isAboveThresh = false;
 		Odometer.getOdometer().setTheta(0);
@@ -86,10 +90,14 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Find first falling edge
 		while (true) {
+
+			// Move forward and get odometer data
 			odometer = Odometer.getOdometer().getXYT();
 			Navigation.leftMotor.forward();
 			Navigation.rightMotor.backward();
 
+			// If is falling and you are above the threshold
+			// then store theta as alpha and stop turning
 			if (isFalling() && isAboveThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
@@ -101,14 +109,19 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Find second falling edge
 		while (true) {
+
+			// Go backwards and get odometer data
 			odometer = Odometer.getOdometer().getXYT();
 			Navigation.leftMotor.backward();
 			Navigation.rightMotor.forward();
 
+			// Set above thresh to true if you are above the threshold 
 			if (readUSDistance() > (D_THRESHHOLD + NOISE_MARGIN)) {
 				isAboveThresh = true;
 			}
 
+			// If is falling and you are above the threshold
+			// then store 180-theta as beta and stop turning
 			if (isFalling() && isAboveThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
@@ -117,14 +130,17 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			}
 		}
 
-
+		//TODO SORT THIS STUFF OUT
+		// Alpha and Beta algorithms
 		if (ALPHA > BETA) {
 			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
 		} else {
 			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
 		} 
-		Odometer.getOdometer().setTheta(0);
 
+		// Set theta to 0 to apply correction
+		// from current reference angle
+		Odometer.getOdometer().setTheta(0);
 		Navigation.turnTo(ANGLE_CORRECTION);
 	}
 
@@ -133,24 +149,32 @@ public class UltrasonicLocalizer implements UltrasonicController {
 	 * @throws OdometerExceptions 
 	 */
 	void risingEdge() throws OdometerExceptions{
+		//Instantiate odometer storage and set theta of odometer to 0
 		double[] odometer = {0,0,0};
 		boolean isBelowThresh = false;
 		Odometer.getOdometer().setTheta(0);
 
+		// Was getting a weird error when checking orientation here
+		// decided to just call findWallBelow() regardless
+
 		// Checks orientation or sets orientation to perform localization
-//		if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
-//			isBelowThresh = true;
-//		} else {
-			findWallBelow();
-			isBelowThresh = true;
-//		}
+		//		if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
+		//			isBelowThresh = true;
+		//		} else {
+		findWallBelow();
+		isBelowThresh = true;
+		//		}
 
 		// Find first rising edge
 		while (true) {
+
+			// Move forward and get odometer data
 			odometer = Odometer.getOdometer().getXYT();
 			Navigation.leftMotor.forward();
 			Navigation.rightMotor.backward();
 
+			// If is rising and you are below the threshold
+			// then store theta as alpha and stop turning
 			if (isRising() && isBelowThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
@@ -162,14 +186,19 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 		// Find second rising edge
 		while (true) {
+
+			// Move backwards and get odometer data
 			odometer = Odometer.getOdometer().getXYT();
 			Navigation.leftMotor.backward();
 			Navigation.rightMotor.forward();
 
+			// Set below thresh to true if you are below the threshold 
 			if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
 				isBelowThresh = true;
 			}
 
+			// If is rising and you are below the threshold
+			// then store 180-theta as beta and stop turning
 			if (isRising() && isBelowThresh) {
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
@@ -178,19 +207,24 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			}
 		}
 
+		//TODO SORT THIS STUFF OUT
+		// Alpha and Beta algorithms
 		if (ALPHA > BETA) {
 			ANGLE_CORRECTION = 45 - ((ALPHA + BETA) / 2); 
 		} else {
 			ANGLE_CORRECTION = 225 - ((ALPHA + BETA) / 2);
 		} 
-		
-		Odometer.getOdometer().setTheta(0);
 
+		// Set theta to 0 to apply correction
+		// from current reference angle
+		Odometer.getOdometer().setTheta(0);
 		Navigation.turnTo(ANGLE_CORRECTION);
 	}
 
 	/**
 	 * Sets orientation of robot so it can perform the localization with falling edges 
+	 * Makes sure that you are above detectable threshold (i.e facing far from wall)
+	 * before you read for falling edge
 	 */
 	void findWallAbove() {
 		while (true) {
@@ -207,6 +241,8 @@ public class UltrasonicLocalizer implements UltrasonicController {
 
 	/**
 	 * Sets orientation of robot so it can perform the localization with rising edges 
+	 * Makes sure that you are below detectable threshold (i.e facing near the wall)
+	 * before you read for rising edge
 	 */
 	void findWallBelow() {
 		while (true) {
@@ -221,6 +257,11 @@ public class UltrasonicLocalizer implements UltrasonicController {
 		}
 	}
 
+	/**
+	 * Checks if fallingEdge, i.e distance
+	 * drops below the threshold
+	 * @return boolean: if fallingEdge or not
+	 */
 	boolean isFalling() {
 		if (readUSDistance() < (D_THRESHHOLD - NOISE_MARGIN)) {
 			return true;
@@ -228,7 +269,12 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			return false;
 		}
 	}
-
+	
+	/**
+	 * Checks if risingEdge, i.e distance
+	 * goes above the threshold
+	 * @return boolean: if risingEdge or not
+	 */
 	boolean isRising() {
 		if (readUSDistance() > (D_THRESHHOLD + NOISE_MARGIN)) {
 			return true;
