@@ -68,13 +68,14 @@ public class LightLocalizer extends Thread implements Runnable {
 		yOffset = -D * Math.abs(Math.cos((xn - xp) / 2));
 
 		// correct the odometer
-		odo.setX(xOffset);
-		odo.setY(yOffset);
+		//odo.setX(xOffset);
+		//odo.setY(yOffset);
 
 		// this makes sure it travels to the true origin
-		Navigation.turnTo(odo.getXYT()[2]+(90-((yn-yp)-180)+(yn-yp)/2));
 		//Navigation.turnTo(0);
-		Navigation.travelToHypot(0, 0);
+		Navigation.travelToHypot(-xOffset, -yOffset);
+		Navigation.turnTo(odo.getXYT()[2]+((90-((yn)-180)+(yn-yp)/2)));
+
 		Lab4.leftMotor.stop(true);
 		Lab4.rightMotor.stop(false);
 

@@ -72,6 +72,7 @@ public class UltrasonicLocalizer implements UltrasonicController {
 			Lab4.lcd.drawString("Final: " + FINAL_ANGLE, 0, 4);
 		} else if(Lab4.isLightLocalizing) {
 			Lab4.lcd.clear();
+			Lab4.lcd.drawString("passedLines: " + LightLocalizer.passedLine, 0, 1);
 			Lab4.lcd.drawString("color: "+ LightLocalizer.newColor, 0, 2);
 			Lab4.lcd.drawString("x: "+ LightLocalizer.result[0], 0, 3);
 			Lab4.lcd.drawString("y: "+ LightLocalizer.result[1], 0, 4);
