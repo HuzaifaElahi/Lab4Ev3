@@ -34,8 +34,8 @@ public class LightLocalizer extends Thread implements Runnable {
 		this.odo = Odometer.getOdometer(Lab4.leftMotor, Lab4.rightMotor, Lab4.TRACK, Lab4.WHEEL_RAD);
 		odo.setTheta(0);
 		result = odo.getXYT();
-		Lab4.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
-		Lab4.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		this.nav = nav;
 		color = new float[myColorSample.sampleSize()];
 		this.csData = color;
@@ -59,6 +59,8 @@ public class LightLocalizer extends Thread implements Runnable {
 
 	private void performLocalization() throws OdometerExceptions {
 		Lab4.isLightLocalizingTurn = true;
+		Navigation.leftMotor.stop(true);
+		Navigation.rightMotor.stop(false);
 		double yp = points.get(0);
 		double xp = points.get(1);
 		double yn = points.get(2);
@@ -73,11 +75,13 @@ public class LightLocalizer extends Thread implements Runnable {
 
 		// this makes sure it travels to the true origin
 		//Navigation.turnTo(0);
+		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		Navigation.travelToHypot(-xOffset, -yOffset);
 		Navigation.turnTo(odo.getXYT()[2]+((90-((yn)-180)+(yn-yp)/2)));
 
-		Lab4.leftMotor.stop(true);
-		Lab4.rightMotor.stop(false);
+		Navigation.leftMotor.stop(true);
+		Navigation.rightMotor.stop(false);
 
 
 	}
@@ -85,8 +89,8 @@ public class LightLocalizer extends Thread implements Runnable {
 	private void getLocalizationPts() {
 		long correctionStart, correctionEnd;
 		double currentOdo = odo.getXYT()[2];
-		Lab4.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
-		Lab4.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
+		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		Navigation.leftMotor.backward();
 		Navigation.rightMotor.forward();
 
