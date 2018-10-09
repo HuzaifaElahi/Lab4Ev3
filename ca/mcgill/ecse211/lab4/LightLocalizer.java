@@ -24,7 +24,7 @@ public class LightLocalizer extends Thread implements Runnable {
 	double oldSample;
 	static int passedLine;
 	static double newColor;
-	private static final double D = 4;
+	private static final double D = 13;
 	static double xOffset = 0;
 	static double yOffset = 0;
 	double dy;
@@ -59,15 +59,14 @@ public class LightLocalizer extends Thread implements Runnable {
 
 	private void performLocalization() throws OdometerExceptions {
 		Lab4.isLightLocalizingTurn = true;
-		Navigation.leftMotor.stop(true);
-		Navigation.rightMotor.stop(false);
+		/*
 		double yp = points.get(0);
 		double xp = points.get(1);
 		double yn = points.get(2);
 		double xn = points.get(3);
 
-		xOffset = -D * Math.cos((yn - yp) / 2);
-		yOffset = -D * Math.abs(Math.cos((xn - xp) / 2));
+		xOffset = -13 * Math.cos((yn - yp) / 2);
+		yOffset = -13 * Math.abs(Math.cos((xn - xp) / 2));
 
 		// correct the odometer
 		//odo.setX(xOffset);
@@ -78,10 +77,26 @@ public class LightLocalizer extends Thread implements Runnable {
 		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		Navigation.travelToHypot(-xOffset, -yOffset);
-		Navigation.turnTo(odo.getXYT()[2]+((90-((yn)-180)+(yn-yp)/2)));
+		Navigation.turnTo(90-(odo.getXYT()[2]+((90-((yn)-180)+(yn-yp)/2))));
 
 		Navigation.leftMotor.stop(true);
-		Navigation.rightMotor.stop(false);
+		Navigation.rightMotor.stop(false);*/
+	    double yp = points.get(0);
+	    double xp = points.get(1);
+	    double yn = points.get(2);
+	    double xn = points.get(3);
+
+	    double xOffset = -D * Math.cos((yn - yp) / 2);
+	    double yOffset = -D * Math.abs(Math.cos((xn - xp) / 2));
+
+	    // corrrect the odometer
+	    odo.setX(xOffset);
+	    odo.setY(yOffset);
+
+	    // this makes sure it travels to the true origin
+	   Navigation.turnWithTheta(0);
+	   //Navigation.travelToHypot(0, 0);
+
 
 
 	}
@@ -159,6 +174,8 @@ public class LightLocalizer extends Thread implements Runnable {
 				Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 				Navigation.leftMotor.rotate(-Navigation.convertDistance(Lab4.WHEEL_RAD, SENSOR_OFFSET), true);
 				Navigation.rightMotor.rotate(-Navigation.convertDistance(Lab4.WHEEL_RAD, SENSOR_OFFSET), false);
+				odo.setX(0);
+				odo.setY(0);
 				Navigation.leftMotor.stop(true);
 				Navigation.rightMotor.stop(false);
 				break;

@@ -136,7 +136,7 @@ public class Navigation {
 			calcTheta = 360 - Math.abs(calcTheta);
 
 		// turn to the found angle
-		//turnTo(calcTheta);
+		turnTo(calcTheta);
 	
 
 		// go
@@ -186,6 +186,42 @@ public class Navigation {
     	boolean turnLeft = false;
 		double deltaAngle = 0;
 		// Get change in angle we want
+		deltaAngle = theta - prevAngle;
+
+		// If deltaAngle is negative, loop it back
+		if (deltaAngle < 0) {
+			deltaAngle = 360 - Math.abs(deltaAngle);
+		}
+
+		// Check if we want to move left or right
+		if (deltaAngle > 180) {
+			turnLeft = true;
+			deltaAngle = 360 - Math.abs(deltaAngle);
+		} else {
+			turnLeft = false;
+		}
+
+		// Set slower rotate speed
+		leftMotor.setSpeed(ROTATE_SPEED);
+		rightMotor.setSpeed(ROTATE_SPEED);
+
+		// Turn motors according to which direction we want to turn in
+		if (turnLeft) {
+			leftMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
+			rightMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
+		} else {
+			leftMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
+			rightMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
+		}
+
+    }
+    
+    public static void turnWithTheta(double theta) throws OdometerExceptions {
+
+    	boolean turnLeft = false;
+		double deltaAngle = 0;
+		// Get change in angle we want
+		prevAngle = Odometer.getOdometer().getXYT()[2];
 		deltaAngle = theta - prevAngle;
 
 		// If deltaAngle is negative, loop it back
