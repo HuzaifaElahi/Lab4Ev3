@@ -118,6 +118,14 @@ public class Navigation {
         }
     }
     
+    /**
+     * This method causes robot to travel a distance based on the
+     * hypotenus value obtained from performing pythagoras
+     * theorem on x and y
+     * @param x
+     * @param y
+     * @throws OdometerExceptions
+     */
     static void travelToHypot(double x, double y) throws OdometerExceptions {
 		double calcTheta = 0, distance = 0, deltaX = 0, deltaY = 0;
 
@@ -149,40 +157,12 @@ public class Navigation {
 	}
     
     /**
-     * This method causes the robot to turn (on point) to the absolute heading theta
-     * 
+     * This method causes the robot to turn (on point) to the relative heading theta
+     * (turn by)
      * @param theta
      * @return void
      */
-    public static void turnTo(double theta) {
-    	/*
-        boolean turnLeft = false;
-        double deltaAngle;
-        
-        // Get change in angle we want
-        deltaAngle = theta - prevAngle;
-        
-        // Turn counter-clockwise if negative theta
-        if (deltaAngle < 0) {
-          deltaAngle = Math.abs(deltaAngle);
-          turnLeft = true;
-        }
-  
-        
-        // Set rotate speed
-        leftMotor.setSpeed(ROTATE_SPEED);
-        rightMotor.setSpeed(ROTATE_SPEED);
-
-        if (turnLeft) {
-          leftMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
-          rightMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
-        } else {
-          leftMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
-          rightMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
-        }
-        
-        prevAngle = theta;*/
-    	
+    public static void turnTo(double theta) {   	
     	boolean turnLeft = false;
 		double deltaAngle = 0;
 		// Get change in angle we want
@@ -213,9 +193,14 @@ public class Navigation {
 			leftMotor.rotate(convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), true);
 			rightMotor.rotate(-convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, deltaAngle), false);
 		}
-
     }
     
+    /**
+     * This method uses the current angle as a reference
+     * to turn to the angle required
+     * @param theta: angle to turn by
+     * @throws OdometerExceptions
+     */
     public static void turnWithTheta(double theta) throws OdometerExceptions {
 
     	boolean turnLeft = false;

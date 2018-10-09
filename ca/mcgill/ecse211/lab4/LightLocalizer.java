@@ -9,6 +9,8 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 public class LightLocalizer extends Thread implements Runnable {
+	
+	// Instantiate Color sensor and other variables
 	public static SensorModes myColor = new EV3ColorSensor(Lab4.portColor);
 	public static SampleProvider myColorSample = myColor.getMode("Red");
 	static float[] sampleColor = new float[myColor.sampleSize()];
@@ -43,13 +45,20 @@ public class LightLocalizer extends Thread implements Runnable {
 
 	@Override
 	public void run() {
+
+		// Set theta to 0 following ultrasonic localization
 		odo.setTheta(0);
+
+		// Move to the origin
 		try {
 			goToOrigin();
 		} catch (OdometerExceptions e1) {
 		}
+		// Retrieve angle pts at each line intersection
 		getLocalizationPts();
 		Lab4.isLightLocalizing = false;
+
+		// Localization is performed 
 		try {
 			performLocalization();
 		} catch (OdometerExceptions e) {
@@ -57,50 +66,38 @@ public class LightLocalizer extends Thread implements Runnable {
 
 	} 
 
+	/**
+	 * Uses the array of theta values to calculate the accurate 0 heading
+	 * @throws OdometerExceptions
+	 */
 	private void performLocalization() throws OdometerExceptions {
-		Lab4.isLightLocalizingTurn = true;
-		/*
-		double yp = points.get(0);
-		double xp = points.get(1);
-		double yn = points.get(2);
-		double xn = points.get(3);
 
-		xOffset = -13 * Math.cos((yn - yp) / 2);
-		yOffset = -13 * Math.abs(Math.cos((xn - xp) / 2));
+		Lab4.isLightLocalizingTurn = true;
+
+		// Retreive theta values from each line detection
+		double yPos = points.get(0);
+		double xPos = points.get(1);
+		double yNeg = points.get(2);
+		double xNeg = points.get(3);
+
+		double xOffset = -D * Math.cos((yNeg - yPos) / 2);
+		double yOffset = -D * Math.abs(Math.cos((xNeg - xPos) / 2));
 
 		// correct the odometer
-		//odo.setX(xOffset);
-		//odo.setY(yOffset);
+		odo.setX(xOffset);
+		odo.setY(yOffset);
 
-		// this makes sure it travels to the true origin
-		//Navigation.turnTo(0);
-		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
-		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
-		Navigation.travelToHypot(-xOffset, -yOffset);
-		Navigation.turnTo(90-(odo.getXYT()[2]+((90-((yn)-180)+(yn-yp)/2))));
-
-		Navigation.leftMotor.stop(true);
-		Navigation.rightMotor.stop(false);*/
-	    double yp = points.get(0);
-	    double xp = points.get(1);
-	    double yn = points.get(2);
-	    double xn = points.get(3);
-
-	    double xOffset = -D * Math.cos((yn - yp) / 2);
-	    double yOffset = -D * Math.abs(Math.cos((xn - xp) / 2));
-
-	    // corrrect the odometer
-	    odo.setX(xOffset);
-	    odo.setY(yOffset);
-
-	    // this makes sure it travels to the true origin
-	   Navigation.turnWithTheta(0);
-	   //Navigation.travelToHypot(0, 0);
+		// Align the robot to 0degrees
+		Navigation.turnWithTheta(0);
+		//Navigation.travelToHypot(0, 0);
 
 
 
 	}
-
+	
+	/**
+	 * Obtains the theta angles at each line intersection
+	 */
 	private void getLocalizationPts() {
 		long correctionStart, correctionEnd;
 		double currentOdo = odo.getXYT()[2];
@@ -116,8 +113,8 @@ public class LightLocalizer extends Thread implements Runnable {
 			correctionStart = System.currentTimeMillis();
 			// Store current robot position and current theta
 			result = odo.getXYT();
-			//If line detected (intensity less than 0.3), only count once by keeping track of last value
-			if((newColor) < 0.3 && oldSample > 0.3) {
+			//If line detected (intensity less than 0.35), only count once by keeping track of last value
+			if((newColor) < 0.35 && oldSample > 0.35) {
 				//Error handling 
 				if(result != null) {
 					//Beep to notify, update counter and find and set correct X and Y using old reference pts
@@ -128,7 +125,7 @@ public class LightLocalizer extends Thread implements Runnable {
 			}
 			//Store color sample
 			oldSample = newColor;
-			
+
 			if(passedLine > 0) {
 				if(result[2] > currentOdo - 5 && result[2] < currentOdo + 5) {
 					break;
@@ -138,7 +135,7 @@ public class LightLocalizer extends Thread implements Runnable {
 			correctionEnd = System.currentTimeMillis();
 			if (correctionEnd - correctionStart < 10) {
 				try {
-					Thread.sleep(10 - (correctionEnd - correctionStart));
+					Thread.sleep(8 - (correctionEnd - correctionStart));
 				} catch (InterruptedException e) {
 					// there is nothing to be done here
 				}
@@ -150,13 +147,13 @@ public class LightLocalizer extends Thread implements Runnable {
 
 	private void goToOrigin() throws OdometerExceptions {
 
-		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);	//Weaker motor compensation
+		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);	
 		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
-
+		
+		// turn 45 degrees clockwise and move to origin
 		Navigation.leftMotor.rotate(Navigation.convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, 45.0), true);
 		Navigation.rightMotor.rotate(-Navigation.convertAngle(Lab4.WHEEL_RAD, Lab4.TRACK, 45.0), false);
 
-		// turn 90 degrees clockwise
 		Navigation.leftMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		Navigation.rightMotor.setSpeed(UltrasonicLocalizer.MOTOR_SPEED);
 		Navigation.leftMotor.forward();
@@ -181,7 +178,6 @@ public class LightLocalizer extends Thread implements Runnable {
 				break;
 			}
 			oldSample = newColor;
-
 		}
 	}
 }

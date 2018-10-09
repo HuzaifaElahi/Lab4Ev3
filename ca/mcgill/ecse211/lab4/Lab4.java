@@ -7,10 +7,14 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 
-
+/**
+ * Class with main method to start the UI
+ * @author Huzaifa, Jake
+ *
+ */
 public class Lab4 {
 
-
+	// Instantiate relevant variables 
 	public static final TextLCD lcd = LocalEV3.get().getTextLCD();
 	public static final double WHEEL_RAD = 2.2;
 	public static final double SQUARE_SIZE = 30.48;
@@ -20,7 +24,7 @@ public class Lab4 {
 	public static boolean isLightLocalizingTurn = false;
 	static Odometer odometer = null;
 
-	//Motors and sensos
+	//Motors and sensor initialization
 	static final Port usPort = LocalEV3.get().getPort("S1");
 	static final Port portColor = LocalEV3.get().getPort("S2");
 	public static final EV3LargeRegulatedMotor leftMotor =
@@ -35,7 +39,7 @@ public class Lab4 {
 		do {
 			lcd.clear();   		// clear the display
 
-			// Ask the user whether map 1 or 2 / map 3 or 4 should be selected
+			// Ask the user whether Falling or Rising edge should be selected
 			lcd.drawString("<      |      >", 0, 0);
 			lcd.drawString("Falling|Rising ", 0, 1);
 			lcd.drawString(" Edge  |  Edge ", 0, 2);
@@ -47,16 +51,17 @@ public class Lab4 {
 			// Until button pressed
 		} while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT); 
 
-
+		// Set odometer and start thread
 		try {
 			odometer = Odometer.getOdometer(leftMotor, rightMotor, TRACK, WHEEL_RAD);
 		} catch (OdometerExceptions e) {
-			System.out.println("Lab 4 line 59");
 		}
 		Thread odoThread = new Thread(odometer);
 		odoThread.start();
 		Navigation nav = new Navigation(leftMotor, rightMotor, odometer);
 		
+		
+		// Based on edge selection, call the corresponding edge method on the Ultrasonic Localizer object
 		if (buttonChoice == Button.ID_LEFT) {
 			isUSLocalizing = true;
 			UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(LocalizationType.FALLING_EDGE, odometer, nav);
@@ -69,17 +74,19 @@ public class Lab4 {
 		}
 		
 		isUSLocalizing = false;
+		
 		// Wait before starting
 		Button.waitForAnyPress();
 		
+		// Upon any input, instantiate light localizer
 		 if (buttonChoice == Button.ID_RIGHT) {   
 			 isLightLocalizing = true;
-	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
+	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);    
 	    	 lightLocalizer.start();
 	      }
 	     else {
 			 isLightLocalizing = true;
-	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);     // Set map 2
+	    	 LightLocalizer lightLocalizer  = new LightLocalizer(odometer, nav);    
 	    	 lightLocalizer.start();
 	     }
 		
